@@ -68,7 +68,6 @@ Built intentionally as an infrastructure platform — not a tutorial project.
 │  SSE Real-Time Feed │
 └─────────────────────┘
 ```
-````
 
 → Full architecture doc: [docs/architecture.md](docs/architecture.md)
 
