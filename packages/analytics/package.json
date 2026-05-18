@@ -1,0 +1,26 @@
+{
+  "name": "@pulseguard/analytics",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@pulseguard/database": "workspace:*",
+    "@pulseguard/redis-client": "workspace:*",
+    "@pulseguard/observability": "workspace:*",
+    "zod": "^3.25.76"
+  }
+}

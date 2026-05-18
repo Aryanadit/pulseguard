@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AnalyticsAggregate {
+  id            String   @id @default(cuid())
+  bucketStart   DateTime
+  endpoint      String
+  tier          String
+  allowedCount  Int      @default(0)
+  blockedCount  Int      @default(0)
+  errorCount    Int      @default(0)
+  avgLatencyMs  Float    @default(0)
+  p95LatencyMs  Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([bucketStart, endpoint, tier])
+  @@index([bucketStart])
+}
