@@ -110,35 +110,60 @@ PulseGuard sustained over **19,000 requests per second** while maintaining **4.2
 ## Repository Structure
 
 ```text
-pulsegaurd/
+pulseguard/
 ├── apps/
-│   ├── api-gateway/          # Fastify API — rate limiting + analytics ingestion
-│   └── dashboard/            # Next.js 15 real-time dashboard
+│   ├── api-gateway/          # Fastify API gateway (rate limiting + analytics ingestion)
+│   ├── analytics-worker/     # Background worker for PostgreSQL aggregation
+│   └── dashboard/            # Next.js 15 real-time analytics dashboard
 │
 ├── packages/
-│   ├── rate-limiter/         # Token Bucket via Redis Lua scripts
-│   ├── analytics/            # Analytics ingestion and SSE stream
-│   ├── analytics-worker/     # Async PostgreSQL persistence worker
-│   ├── redis-client/         # Shared Redis connection + abstractions
-│   ├── database/             # Prisma client + schema
-│   ├── observability/        # Prometheus metrics registration
-│   ├── errors/               # Typed error classes
-│   ├── shared-types/         # Cross-package TypeScript types
-│   └── config/               # Environment + configuration management
+│   ├── rate-limiter/         # Redis Lua Token Bucket implementation
+│   ├── analytics/            # Event schemas, producers, and query services
+│   ├── redis-client/         # Shared Redis connection layer
+│   ├── database/             # Prisma schema and PostgreSQL client
+│   ├── observability/        # Prometheus metrics and registry
+│   ├── config/               # Environment and configuration management
+│   ├── errors/               # Typed domain error classes
+│   ├── shared-types/         # Cross-package TypeScript interfaces
+│   └── validation/           # Request validation utilities and schemas
 │
 ├── benchmark/
-│   ├── scripts/              # k6 test scripts (smoke, constant, stress-ramp)
+│   ├── scripts/              # k6 load tests (smoke, constant, stress-ramp)
 │   ├── config/               # Benchmark constants
-│   └── results/              # Captured benchmark outputs
+│   ├── results/              # Raw benchmark outputs
+│   └── screenshots/          # Visual benchmark artifacts
 │
 ├── docs/
 │   ├── architecture.md
 │   ├── benchmarking.md
 │   ├── api-reference.md
-│   └── engineering-decisions.md
+│   ├── engineering-decisions.md
+│   └── images/
+│       ├── architecture-diagram.png
+│       ├── dashboard-overview.png
+│       ├── grafana-dashboard.png
+│       └── k6-results.png
 │
-├── docker-compose.yml        # Full stack: API × 2, Redis, Postgres, Prometheus, Grafana
-└── turbo.json
+├── infrastructure/
+│   ├── grafana/              # Grafana provisioning and datasources
+│   ├── prometheus/           # Prometheus configuration
+│   ├── nginx/                # Reverse proxy configuration
+│   └── docker/               # Container-related assets
+│
+├── infra/
+│   └── prometheus/           # Legacy Prometheus configuration
+│
+├── scripts/                  # Utility and automation scripts
+│
+├── docker-compose.yml        # Multi-service local infrastructure
+├── package.json              # Workspace root configuration
+├── pnpm-workspace.yaml       # pnpm workspace definition
+├── turbo.json                # Turborepo build pipeline
+├── tsconfig.base.json        # Shared TypeScript configuration
+├── prisma.config.ts          # Prisma configuration
+├── .env.example              # Environment template
+├── .gitignore
+└── README.md
 
 ```
 
