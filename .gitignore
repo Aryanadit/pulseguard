@@ -48,3 +48,4 @@ temp/
 
 # Docker overrides
 docker-compose.override.yml
+project-structure.txt
