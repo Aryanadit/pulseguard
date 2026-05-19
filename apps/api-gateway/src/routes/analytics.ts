@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { getAnalyticsSummary } from "@pulseguard/analytics";
 
 const ANALYTICS_HISTORY_LIMIT = 60;
-const STREAM_INTERVAL_MS = 3_000;
+const STREAM_INTERVAL_MS = 1_000;
 
 export async function analyticsRoutes(server: FastifyInstance) {
   /**
@@ -32,8 +32,8 @@ export async function analyticsRoutes(server: FastifyInstance) {
       Connection: "keep-alive",
       "X-Accel-Buffering": "no", // Disable proxy buffering (e.g. Nginx)
 
-      // Explicit CORS headers for the dashboard running on localhost:3000.
-      "Access-Control-Allow-Origin": "http://localhost:3000",
+      // Explicit CORS headers for the dashboard running on localhost:3001.
+      "Access-Control-Allow-Origin": "http://localhost:3001",
       "Access-Control-Allow-Credentials": "true",
     });
 

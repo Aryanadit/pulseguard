@@ -1,5 +1,13 @@
 import { prisma } from "@pulseguard/database";
+import {
+  ANALYTICS_BUCKET_PREFIX,
+  ANALYTICS_BUCKET_TTL_SECONDS,
+} from "@pulseguard/analytics";
+import { createLogger } from "@pulseguard/observability";
+import { getRedisClient } from "@pulseguard/redis-client";
 import { getMinuteBucket } from "../utils/time-bucket.js";
+
+const logger = createLogger("analytics-worker");
 
 export interface AggregateInput {
   timestamp: number;
@@ -9,9 +17,41 @@ export interface AggregateInput {
   latencyMs: number;
 }
 
-export async function recordAggregate(input: AggregateInput): Promise<void> {
-  const bucketStart = getMinuteBucket(input.timestamp);
+function getAggregateKey(bucketStart: Date, endpoint: string, tier: string): string {
+  return [
+    ANALYTICS_BUCKET_PREFIX,
+    bucketStart.getTime(),
+    encodeURIComponent(endpoint),
+    encodeURIComponent(tier),
+  ].join(":");
+}
 
+async function recordRedisAggregate(
+  input: AggregateInput,
+  bucketStart: Date,
+): Promise<void> {
+  const redis = getRedisClient();
+  const key = getAggregateKey(bucketStart, input.endpoint, input.tier);
+  const requestCountField = input.allowed ? "allowedCount" : "blockedCount";
+
+  await redis
+    .multi()
+    .hset(key, {
+      bucketStart: bucketStart.toISOString(),
+      endpoint: input.endpoint,
+      tier: input.tier,
+    })
+    .hincrby(key, requestCountField, 1)
+    .hincrbyfloat(key, "latencySumMs", input.latencyMs)
+    .hincrby(key, "sampleCount", 1)
+    .expire(key, ANALYTICS_BUCKET_TTL_SECONDS)
+    .exec();
+}
+
+async function recordPostgresAggregate(
+  input: AggregateInput,
+  bucketStart: Date,
+): Promise<void> {
   await prisma.analyticsAggregate.upsert({
     where: {
       bucketStart_endpoint_tier: {
@@ -34,4 +74,24 @@ export async function recordAggregate(input: AggregateInput): Promise<void> {
       avgLatencyMs: input.latencyMs,
     },
   });
+}
+
+export async function recordAggregate(input: AggregateInput): Promise<void> {
+  const bucketStart = getMinuteBucket(input.timestamp);
+
+  await recordRedisAggregate(input, bucketStart);
+
+  try {
+    await recordPostgresAggregate(input, bucketStart);
+  } catch (error) {
+    logger.warn(
+      {
+        error,
+        bucketStart: bucketStart.toISOString(),
+        endpoint: input.endpoint,
+        tier: input.tier,
+      },
+      "Failed to persist analytics aggregate to PostgreSQL",
+    );
+  }
 }

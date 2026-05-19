@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import type { AnalyticsSummaryResponse } from "@pulseguard/analytics";
 
-const SUMMARY_URL = "http://localhost:3001/api/analytics/summary";
-const STREAM_URL = "http://localhost:3001/api/analytics/stream";
+const SUMMARY_URL = "/api/analytics/summary";
+const STREAM_URL = "/api/analytics/stream";
 
 function parseAnalyticsPayload(raw: string): AnalyticsSummaryResponse {
   return JSON.parse(raw) as AnalyticsSummaryResponse;

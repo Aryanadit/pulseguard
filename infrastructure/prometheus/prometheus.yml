@@ -5,5 +5,10 @@ global:
 scrape_configs:
   - job_name: "api-gateway"
     static_configs:
-      - targets: ["host.docker.internal:3001"]
+      - targets:
+          - "pulsegaurd-api-gateway-1:3001"
+          - "pulsegaurd-api-gateway-2:3001"
+          - "pulsegaurd-api-gateway-3:3001"
+          - "pulsegaurd-api-gateway-4:3001"
+          - "pulsegaurd-api-gateway-5:3001"
     metrics_path: /metrics

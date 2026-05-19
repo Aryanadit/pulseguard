@@ -12,7 +12,7 @@ export const RateLimitEventSchema = z.object({
 
     return value === "true";
   }),
-  remaining: z.coerce.number().int().nonnegative(),
+  remaining: z.coerce.number().int(),
   latencyMs: z.coerce.number().nonnegative(),
 });
 

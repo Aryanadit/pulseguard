@@ -4,6 +4,8 @@ import { useAnalyticsStream } from "@/hooks/useAnalyticsStream";
 import { KpiCard } from "@/components/KpiCard";
 import { LatencyChart } from "@/components/charts/LatencyChart";
 import { RequestsChart } from "@/components/charts/RequestsChart";
+import { LiveEventStreamViewer } from "@/components/observability/LiveEventStreamViewer";
+import { ObservabilityOverview } from "@/components/observability/ObservabilityOverview";
 
 function formatTimestamp(timestamp: string): string {
   return new Date(timestamp).toLocaleString();
@@ -35,7 +37,7 @@ export function AnalyticsDashboard() {
     return null;
   }
 
-  const { totals, latency, timeSeries, timestamp } = data;
+  const { totals, latency, timeSeries, timestamp, observability } = data;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -46,10 +48,10 @@ export function AnalyticsDashboard() {
               PulseGuard
             </p>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              Operational Dashboard
+              Engineering Observability Console
             </h1>
             <p className="mt-1 text-sm text-zinc-400">
-              Live rate limiter and request analytics
+              Live request analytics and core infrastructure health
             </p>
           </div>
           <p className="text-xs text-zinc-500">
@@ -99,6 +101,12 @@ export function AnalyticsDashboard() {
               </p>
             )}
           </article>
+        </section>
+
+        <ObservabilityOverview observability={observability} />
+
+        <section className="mt-8">
+          <LiveEventStreamViewer events={observability.liveEvents} />
         </section>
       </div>
     </div>

@@ -15,7 +15,7 @@ const server = Fastify({
 });
 
 await server.register(cors, {
-  origin: ["http://localhost:3000"],
+  origin: ["http://localhost:3001"],
 });
 
 server.get("/health", async (): Promise<HealthResponse> => {

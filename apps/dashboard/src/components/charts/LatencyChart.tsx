@@ -1,11 +1,11 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { AnalyticsTimeSeriesPoint } from "@pulseguard/analytics";
 import {
   CartesianGrid,
   Line,
   LineChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -22,17 +22,48 @@ function formatBucketLabel(bucketStart: string): string {
   });
 }
 
+function useChartSize() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) {
+      return;
+    }
+
+    const updateSize = () => {
+      const rect = element.getBoundingClientRect();
+      setSize({
+        width: Math.max(0, Math.floor(rect.width)),
+        height: Math.max(0, Math.floor(rect.height)),
+      });
+    };
+
+    updateSize();
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, ...size };
+}
+
 export function LatencyChart({ data }: LatencyChartProps) {
+  const { ref, width, height } = useChartSize();
   const chartData = data.map((point) => ({
     ...point,
     label: formatBucketLabel(point.bucketStart),
   }));
 
   return (
-    <div className="h-80 w-full">
-      <div className="min-w-0 h-full w-full">
-        <ResponsiveContainer width="100%" height="100%">
+    <div ref={ref} className="h-80 w-full min-w-0">
+      {width > 0 && height > 0 ? (
           <LineChart
+            width={width}
+            height={height}
             data={chartData}
             margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
           >
@@ -69,8 +100,7 @@ export function LatencyChart({ data }: LatencyChartProps) {
               activeDot={{ r: 4 }}
             />
           </LineChart>
-        </ResponsiveContainer>
-      </div>
+      ) : null}
     </div>
   );
 }
